@@ -8,6 +8,8 @@ Attributes
 
 - *data (property)* sets the datasource for the view. Datasource is provided as a NSArray containing NSNumber objects.
 
+- *target (property)* sets a value for a straight target line to be drawn on the graph.
+
 - *lineColor (property)* sets the color used for line display. Color is supplied as a UIColor object.
 
 - *highlightedColor (property)* sets the color to be used for line display when the view is selected. Color is supplied as a UIColor object.
