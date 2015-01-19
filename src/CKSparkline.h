@@ -30,6 +30,7 @@ static inline CGPoint calculatePosition(NSArray *data, int index, CKBoundary *bo
     BOOL selected;
 
     UIColor *lineColor;
+    UIColor *targetLineColor;
     CGFloat lineWidth;
     UIColor *highlightedLineColor;
     BOOL drawPoints;
@@ -48,6 +49,10 @@ static inline CGPoint calculatePosition(NSArray *data, int index, CKBoundary *bo
 @property (nonatomic) BOOL drawArea;
 @property (nonatomic, retain) NSArray *data;
 @property (readonly) NSArray *computedData;
+
+//New target line properties.
+@property (nonatomic, retain) UIColor *targetlineColor;
+@property (nonatomic) BOOL drawTargetDashed;
 
 - (void)initializeDefaults;
 - (void)setSelected:(BOOL)isSelected;
