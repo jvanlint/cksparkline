@@ -23,7 +23,7 @@
     self.sparkline.drawArea = YES;
 
     // Create an array of data
-    self.sparkline.data = [NSArray arrayWithObjects:
+    NSArray *myArray = [NSArray arrayWithObjects:
                               [NSNumber numberWithFloat:2.0],
                               [NSNumber numberWithFloat:4.5],
                               [NSNumber numberWithFloat:5.2],
@@ -33,7 +33,15 @@
                               [NSNumber numberWithFloat:9.2],
                               nil];
 }
-
+    
+    // Specify target line to be dashed.
+    self.sparkline.drawTargetDashed=YES;
+    
+    //Specify color of target line.
+    self.sparkline.targetlineColor=[UIColor greenColor];
+   
+    //Assign data array and target value to data property.
+    self.sparkline.data=@[myArray, @6];
 
 - (void)dealloc
 {
