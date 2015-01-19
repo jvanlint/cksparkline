@@ -1,6 +1,11 @@
 #import "CKSparkline.h"
 
 @implementation CKSparkline
+{
+    float targetValue;
+    float computedTargetValue;
+    BOOL dataContainsTargetValue;
+}
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -34,10 +39,14 @@
     self.selected = NO;
     self.backgroundColor = [UIColor clearColor];
     self.lineColor = [UIColor colorWithWhite:0.65 alpha:1.0];
+    self.targetlineColor=[UIColor blackColor];
     self.highlightedLineColor = [UIColor whiteColor];
     self.lineWidth = 1.0;
     self.drawPoints = NO;
     self.drawArea = NO;
+    self.drawTargetDashed=NO;
+    
+    dataContainsTargetValue=NO;
 }
 
 - (void)setSelected:(BOOL)isSelected
@@ -53,8 +62,25 @@
 
 - (void)setData:(NSArray *)newData
 {
+    
+    //setData has now been modified slighly to accept an array of arrays. The first
+    //object in the array needs to contain the graph data. The second item in the array should
+    //be a target value.
+    //We do this because if we use a property for setting the target we would always need to
+    //force the user to set it before setting the data property. This is not intuitive and
+    //could lead to confusion so it is better to code for an array that contains an array of data as the first
+    //object and a target value as the second object. If the target object is nil is also enables
+    //us to code for a target value not being present and avoid drawing a target line.
+    
     CK_ARC_RELEASE(data);
-    data = CK_ARC_RETAIN(newData);
+    data = CK_ARC_RETAIN([newData objectAtIndex:0]);
+    
+    //Check to see if a target value was passed and if so, assign to class variable targetValue and update a flag indicating target is available.
+    if ([newData count]==2)
+    {
+        dataContainsTargetValue =YES;
+        targetValue = [[newData objectAtIndex:1] floatValue];
+    }
     
     [self recalculateComputedData];
     [self setNeedsDisplay];
@@ -69,6 +95,17 @@
     for (NSNumber *dataValue in self.data) {
         min = MIN([dataValue floatValue], min);
         max = MAX([dataValue floatValue], max);
+    }
+    
+    //If a target value has been specified then we should also factor this value into the min and max.
+    //We can also go ahead and compute the new target value for graphing.
+    
+    if(dataContainsTargetValue)
+    {
+        min = MIN(targetValue, min);
+        max = MAX(targetValue, max);
+        
+        computedTargetValue=(targetValue - min) / (max - min + 1.0);
     }
     
     for (NSNumber *dataValue in self.data) {
@@ -110,6 +147,11 @@
     
     [self drawLineInRect:rect withContext:context];
     
+    if(dataContainsTargetValue)
+    {
+        [self drawTargetLineInRect:rect withContext:context];
+    }
+    
     if (self.drawPoints) {
         CGContextSetFillColorWithColor(context, displayColor);
         [self drawPointsInRect:rect withContext:context];
@@ -128,6 +170,35 @@
     }
     
     CGContextStrokePath(context);    
+    CGContextRestoreGState(context);
+}
+
+- (void)drawTargetLineInRect:(CGRect)rect withContext:(CGContextRef)context
+{
+    
+    static CGFloat const kDashedPhase           = (0.0f);
+    static CGFloat const kDashedLinesLength[]   = {4.0f, 2.0f};
+    static size_t const kDashedCount            = (2.0f);
+    
+    CGColorRef displayColor=[[self.targetlineColor colorWithAlphaComponent:0.7] CGColor];
+    CGContextSetLineWidth(context, 0.5);
+    CGContextSetStrokeColorWithColor(context, displayColor);
+    
+    CGContextSaveGState(context);
+    CGContextBeginPath(context);
+    CGContextMoveToPoint(context, boundary.min.x, boundary.max.y - (boundary.max.y - boundary.min.y) * computedTargetValue);
+    
+    for (int i = 1; i < [self.computedData count]; i++) {
+        CGPoint point = CGPointMake(boundary.min.x + (boundary.max.x - boundary.min.x) * (i / ([data count] - 1)), boundary.max.y - (boundary.max.y - boundary.min.y) * computedTargetValue);
+        CGContextAddLineToPoint(context, point.x, point.y);
+    }
+    
+    if(self.drawTargetDashed)
+    {
+        CGContextSetLineDash(context, kDashedPhase, kDashedLinesLength, kDashedCount);
+    }
+    
+    CGContextStrokePath(context);
     CGContextRestoreGState(context);
 }
 
