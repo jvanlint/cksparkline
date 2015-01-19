@@ -6,15 +6,11 @@ CKSparkline is an open source library that provides your application easy access
 Attributes
 ----------
 
-- *data (property)* sets the datasource for the view. Datasource is provided as a NSArray containing NSNumber objects.
-
-- *target (property)* sets a value for a straight target line to be drawn on the graph.
-
-- *upperLimit (property)* sets a value for a straight upper limit line to be drawn on the graph.
-
-- *lowerLimit (property)* sets a value for a straight lower limit line to be drawn on the graph.
+- *data (property)* sets the datasource for the view. Datasource is provided as a NSArray containing 2 objects. The first object is an array of values for plotting. The second object is a number representing the target line.
 
 - *lineColor (property)* sets the color used for line display. Color is supplied as a UIColor object.
+
+- *targetLineColor (property)* sets the color used for the taregt line display. Color is supplied as a UIColor object. Default color is black.
 
 - *highlightedColor (property)* sets the color to be used for line display when the view is selected. Color is supplied as a UIColor object.
 
@@ -25,6 +21,8 @@ Attributes
 - *drawPoints (property)* draws an ellipse at each data point, with the final point drawn in red.
 
 - *drawArea (property)* fills the area below the line.
+
+- *drawTargetDashed (property)* specifies whether target line should be dashed. Defaults to solid.
 
 
 Example Usage
